@@ -1,8 +1,7 @@
-import pandas as pd
-import numpy as np
 import os
+import pandas as pd
 
-
+### rawdata preprocessing
 def read_csv() -> pd.DataFrame:
     file = '../data/scorecards/UDisc Scorecards.csv'
     rawdata = pd.read_csv(file)
@@ -19,7 +18,6 @@ def clear_unfinished(rawdata: pd.DataFrame) -> pd.DataFrame:
         rawdata = rawdata.loc[rawdata.loc[:,rawdata.columns[i]]!=0,:]
     return rawdata
 
-
 def clear_lowpar(rawdata: pd.DataFrame) -> pd.DataFrame:
     for i in range(6, rawdata.columns.size):
         matchme = rawdata.loc[(rawdata.iloc[:,0]=='Par')
@@ -34,6 +32,8 @@ def clear_lowpar(rawdata: pd.DataFrame) -> pd.DataFrame:
             continue
     return rawdata
 
+
+### pardata branch
 def create_pardata (rawdata: pd.DataFrame) -> pd.DataFrame:
     pardata = rawdata[rawdata['PlayerName'] == 'Par']
 
@@ -59,6 +59,8 @@ def clear_spaces(pardata: pd.DataFrame) -> pd.DataFrame:
     pardata.iloc[:,1] = pardata.iloc[:,1].apply(lambda x: x.strip())
     return pardata
 
+
+### scoredata branch
 def create_scoredata(rawdata: pd.DataFrame) -> pd.DataFrame:
     scoredata = rawdata[rawdata['PlayerName'] != 'Par']
     return scoredata
@@ -69,6 +71,9 @@ def add_Teamsize(scoredata: pd.DataFrame) -> pd.DataFrame:
     return scoredata
 
 
+
+
+### bundled functions
 def create_df_pardata():
     pardata =  clear_spaces(
         add_HoleCount(
@@ -78,7 +83,25 @@ def create_df_pardata():
                         clear_custom(
                             read_csv()))))))
     return pardata
-    
+
+def create_df_scoredata():
+    scoredata =  add_Teamsize(
+            create_scoredata(
+                clear_lowpar(
+                    clear_unfinished(
+                        clear_custom(
+                            read_csv())))))
+    return scoredata
+
+def delete_csv():
+    file = '../data/scorecards/UDisc Scorecards.csv'
+    if os.path.exists(file):
+        os.remove(file)
+
+
+
+
+
 
 
 

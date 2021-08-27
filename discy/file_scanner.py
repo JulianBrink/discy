@@ -17,14 +17,30 @@ Das wird durch "DIRECTORY_TO_WATCH = '.'" notiert. (Sonst wäre ein Ordner Pfad 
 Mein anderes Script befindet sich auch in dem selben Ordner und muss erst importiert werden.
 Aus diesem Script wird dann eine bestimmte Function ausgeführt. 
 '''
+## modules from scorecard_reader
+#import os
+#import pandas as pd
+
+## modules from scorecard_writer
+#system handling modules
+
+# work tools
+#import sqlalchemy as sqla
+#import pandas as pd
+#import pangres #used for upsert method (if used?)
+
+# my own modules
+#import sql_reader as sqr
+
+
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import scorecard_reader
-
+import scorecard_writer as sw
+#import scorecard_reader as sr
 
 class Watcher:
-    DIRECTORY_TO_WATCH = "."
+    DIRECTORY_TO_WATCH = "..\data\scorecards"
 
     def __init__(self):
         self.observer = Observer()
@@ -54,7 +70,8 @@ class Handler(FileSystemEventHandler):
             # Take any action here when a file is first created.
             print("Received created event - %s." % event.src_path)
             try:
-                pandas_read_transform_write_to_SQL_Server.func()
+                sw.write_all()
+                #sr.delete_csv()
             except:
                 print('something went wrong, try again')
 
